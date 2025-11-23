@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(uuid())
+  name          String
+  age           Int
+  emailAddress  String     @unique
+  phoneNumber   String
+  nationality   String
+  adhaarNumber  String?
+  contactName   String
+  contactemail  String
+  relationship  String
+  password      String
+  location      Location?  // optional back-reference, no fields/references
+  destination  String?
+}
+
+model Location {
+  id           String  @id @default(uuid())
+  uid          String  @unique
+  location     String
+  time         String
+  safe         Int
+  user         User     @relation(fields: [uid], references: [id]) // foreign key side
+}
+
