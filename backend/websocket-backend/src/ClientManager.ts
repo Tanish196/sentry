@@ -303,7 +303,7 @@ public async close() {
 
     // 2) Create a transporter with SMTP settings
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com", // Gmail SMTP server
+      host: "smtp.gmail.com", // Gmail SMTP serve
       port: 587, // 465 for secure
       secure: false, // true if port is 465
       auth: {
