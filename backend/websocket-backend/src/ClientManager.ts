@@ -82,6 +82,76 @@ const graph: Record<string, string[]> = {
   Seelampur: ["Yamuna Vihar", "Welcome"],
   Welcome: ["Seelampur", "Shahdara"],
 };
+const locationCoords: Record<string, { lat: number; lng: number }> = {
+  Alipur: { lat: 28.7986, lng: 77.1331 },
+  Narela: { lat: 28.8521, lng: 77.0920 },
+  Bawana: { lat: 28.8266, lng: 77.0319 },
+  "Holambi Kalan": { lat: 28.7877, lng: 77.1025 },
+  "Swaroop Nagar": { lat: 28.7487, lng: 77.1660 },
+  Burari: { lat: 28.7285, lng: 77.2090 },
+  Wazirabad: { lat: 28.7353, lng: 77.2210 },
+  Timarpur: { lat: 28.6977, lng: 77.2245 },
+  "Civil Lines": { lat: 28.6822, lng: 77.2243 },
+  "GTB Nagar": { lat: 28.6962, lng: 77.2060 },
+  "Mukherjee Nagar": { lat: 28.7045, lng: 77.2067 },
+  "Model Town": { lat: 28.7043, lng: 77.1893 },
+  Azadpur: { lat: 28.7090, lng: 77.1810 },
+  "Adarsh Nagar": { lat: 28.7255, lng: 77.1650 },
+  "Shalimar Bagh": { lat: 28.7014, lng: 77.1708 },
+  Rohini: { lat: 28.7490, lng: 77.0560 },
+  Pitampura: { lat: 28.6980, lng: 77.1325 },
+  Mangolpuri: { lat: 28.6906, lng: 77.0944 },
+  Peeragarhi: { lat: 28.6796, lng: 77.0776 },
+  "Paschim Vihar": { lat: 28.6693, lng: 77.1085 },
+  "Punjabi Bagh": { lat: 28.6672, lng: 77.1180 },
+  "Rajouri Garden": { lat: 28.6412, lng: 77.1208 },
+  "Tagore Garden": { lat: 28.6471, lng: 77.1132 },
+  "Tilak Nagar": { lat: 28.6320, lng: 77.0893 },
+  Janakpuri: { lat: 28.6231, lng: 77.0872 },
+  "Uttam Nagar": { lat: 28.6235, lng: 77.0567 },
+  Dwarka: { lat: 28.5921, lng: 77.0460 },
+  Najafgarh: { lat: 28.6139, lng: 76.9798 },
+  Nangloi: { lat: 28.6824, lng: 77.0672 },
+  "Kashmiri Gate": { lat: 28.6676, lng: 77.2268 },
+  "Old Delhi": { lat: 28.6613, lng: 77.2300 },
+  "Chandni Chowk": { lat: 28.6560, lng: 77.2303 },
+  Daryaganj: { lat: 28.6414, lng: 77.2477 },
+  Paharganj: { lat: 28.6435, lng: 77.2189 },
+  "Karol Bagh": { lat: 28.6510, lng: 77.1910 },
+  "Patel Nagar": { lat: 28.6395, lng: 77.1780 },
+  "Rajendra Nagar": { lat: 28.6417, lng: 77.1894 },
+  "Connaught Place": { lat: 28.6315, lng: 77.2167 },
+  "Mandi House": { lat: 28.6285, lng: 77.2328 },
+  ITO: { lat: 28.6264, lng: 77.2396 },
+  "Lajpat Nagar": { lat: 28.5703, lng: 77.2435 },
+  "East of Kailash": { lat: 28.5608, lng: 77.2425 },
+  "Kailash Colony": { lat: 28.5567, lng: 77.2355 },
+  "Greater Kailash": { lat: 28.5342, lng: 77.2405 },
+  "Chirag Delhi": { lat: 28.5308, lng: 77.2312 },
+  "Hauz Khas": { lat: 28.5494, lng: 77.2001 },
+  "Green Park": { lat: 28.5586, lng: 77.2063 },
+  AIIMS: { lat: 28.5672, lng: 77.2086 },
+  "Safdarjung Enclave": { lat: 28.5660, lng: 77.1975 },
+  "RK Puram": { lat: 28.5687, lng: 77.1730 },
+  "Vasant Vihar": { lat: 28.5691, lng: 77.1570 },
+  "Vasant Kunj": { lat: 28.5266, lng: 77.1533 },
+  Mehrauli: { lat: 28.5245, lng: 77.1855 },
+  Saket: { lat: 28.5222, lng: 77.2049 },
+  "Malviya Nagar": { lat: 28.5280, lng: 77.2100 },
+  SDA: { lat: 28.5440, lng: 77.2089 },
+  Mahipalpur: { lat: 28.5436, lng: 77.1180 },
+  Aerocity: { lat: 28.5450, lng: 77.1190 },
+  "IGI Airport": { lat: 28.5562, lng: 77.1000 },
+  "Laxmi Nagar": { lat: 28.6260, lng: 77.2789 },
+  "Preet Vihar": { lat: 28.6468, lng: 77.3150 },
+  "Anand Vihar": { lat: 28.6462, lng: 77.3155 },
+  Karkardooma: { lat: 28.6534, lng: 77.3090 },
+  "Vivek Vihar": { lat: 28.6721, lng: 77.3154 },
+  Shahdara: { lat: 28.6750, lng: 77.3200 },
+  Seemapuri: { lat: 28.6878, lng: 77.3413 },
+  "Dilshad Garden": { lat: 28.6752, lng: 77.3223 }
+};
+
 export class ClientManager {
   private userid: string; 
   private ws: WebSocket;
@@ -159,8 +229,16 @@ export class ClientManager {
     }
     const routeResult = await this.route(data.location, destination);
     // 4) Send route back to client
-    this.ws.send(JSON.stringify(routeResult));
-    console.log("Route sent to client:", routeResult);
+    const routeCoords = routeResult.map(loc => locationCoords[loc]);
+    this.ws.send(JSON.stringify({
+      path: routeResult,
+      coords: routeCoords
+    }));
+    
+    console.log("Route sent to client:", {
+      path: routeResult,
+      coords: routeCoords
+    })
   }
     //----------------------------safemap-------------------------------------
 public async setNode() {
