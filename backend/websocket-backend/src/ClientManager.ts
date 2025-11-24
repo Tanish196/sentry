@@ -264,7 +264,7 @@ while (true) {
 
 
   // ------------------------ isSafe ------------------------
- private async isSafe(threshold: number = 10): Promise<boolean> {
+ private async isSafe(threshold: number = 0.01): Promise<boolean> {
   const lasttime = await prisma.location.findFirst({
     where: { uid: this.userid },
     select: { time: true, safe: true }, // safe is numeric score
