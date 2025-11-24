@@ -19,7 +19,7 @@ export default [
         emergency: {
             id:3,
             contactName: 'Emergency Contact Name',
-            contactPhone: 'Emergency Contact Phone',
+            contactPhone: 'Emergency Contact email',
             contactRelation: 'Relationship',
             medicalInfo: 'Medical Information (if any)'
           },

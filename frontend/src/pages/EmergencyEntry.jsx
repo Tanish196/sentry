@@ -22,10 +22,10 @@ const getExistingEmergencyData = () => {
 
 
 export default function EmergencyEntry(props){
-
     const formRef = useRef(null)
     const navigate = useNavigate()
     const { updateFormData } = useRegistrationData()
+    const { formData } = useRegistrationData();
 
     const [isSuccess, setIsSuccess] = useState(false)
 
@@ -50,61 +50,41 @@ async function handleNextStep(e) {
     e.preventDefault();
     const form = formRef.current;
 
-    if (!form) {
-        console.error("Form reference is missing.");
-        return;
-    }
-
     if (!form.checkValidity()) {
         form.reportValidity();
-        console.log("Validation failed: Please fill out all required fields.");
         return;
     }
 
-    const formData = new FormData(form);
-    const newEntry = Object.fromEntries(formData);
+    const formDataLocal = new FormData(form);
+    const newEntry = Object.fromEntries(formDataLocal);
 
-    // Construct the payload matching your backend fields
+    // Merge Step 1 + Step 2
     const payload = {
-        Name: newEntry.name,                 // your input name for user's name
-        Age: newEntry.age,                   // your input name for age
-        Email_Address: newEntry.email,       // input for email
-        Phone_Number: newEntry.phone,        // input for phone
-        Nationality: newEntry.nationality,   // input for nationality
-        Adhaar_Number: newEntry.adhaar,      // input for adhaar
-        Contact_Name: newEntry.contactName,
-        Contact_Phone: newEntry.contactPhoneNum,
-        Relationship: newEntry.relationship,
-        password: newEntry.password
+        name: formData.fullName,
+        age: Number(formData.age),
+        emailAddress: formData.email,
+        phoneNumber: formData.phoneNumber,
+        nationality: formData.nationality,
+        adhaarNumber: formData.aadhar,
+        password: formData.password,
+
+        // emergency contact
+        contactName: newEntry.contactName,
+        contactemail: newEntry.contactPhoneNum,
+        relationship: newEntry.relationship,
+        destination: formData.destination || ""
     };
 
     try {
-        const response = await axios.post("http://localhost:3030/signup", payload);
+        console.log("Sending payload:", payload);
+        const response = await axios.post("https://sentry-3.onrender.com/signup", payload);
 
         console.log("Signup successful:", response.data);
-
-        // Optionally, save emergency data in localStorage too
-        const existingData = getExistingEmergencyData();
-        const newContact = {
-            name: newEntry.contactName,
-            phone: newEntry.contactPhoneNum,
-            relationship: newEntry.relationship,
-            id: Date.now()
-        };
-        const updatedData = {
-            medicalInfo: newEntry.description || "",
-            contacts: [...existingData.contacts, newContact]
-        };
-        localStorage.setItem('emergencyData', JSON.stringify(updatedData));
-        handleSuccessAndNavigate(updatedData);
-
+        alert("Signup successful");
+        navigate("/");
     } catch (error) {
-        if (error.response) {
-            // Server responded with an error
-            console.error("Error from server:", error.response.data);
-        } else {
-            console.error("Network or other error:", error.message);
-        }
+        if (error.response) console.log("Error from server:", error.response.data);
+        else console.log("Network error:", error.message);
     }
 }
 
@@ -140,7 +120,7 @@ async function handleNextStep(e) {
 
                         <label htmlFor="contactPhoneNum">
                             {props.data.emergency.contactPhone}:
-                            <input id="contactPhoneNum" type="tel" name="contactPhoneNum" placeholder="0000-0000-00" required></input>
+                            <input id="contactPhoneNum" type="tel" name="contactPhoneNum" placeholder="abcd@gmail.com" required></input>
                         </label>
 
                         <label htmlFor="relationship">

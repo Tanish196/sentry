@@ -7,20 +7,46 @@ import BackgroundAnimation from "@/components/r3f/BackgroundAnimation";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
 
-  function handleLogin(e) {
-    e.preventDefault();
+async function handleLogin(e) {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("https://sentry-3.onrender.com/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        emailAddress: email,
+        password: password,
+      }),
+    });
+
+    const data = await res.json();
+    console.log("Response:", data);
+
+    if (!res.ok) {
+      alert(data.message || "Login failed");
+      return;
+    }
+
+    // Store as Bearer token
+    localStorage.setItem("token", `Bearer ${data.token}`);
+
+    alert("Login successful!");
     navigate("/profile");
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
   }
+}
+
 
   return (
     <>
       <Header />
       <BackgroundAnimation />
 
-      {/* Overlay wrapper so text stays above animation */}
       <div className="page-wrapper">
         <div className="login-container">
           <div className="login-card">
