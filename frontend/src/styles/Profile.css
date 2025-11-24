@@ -1,0 +1,139 @@
+@reference 'tailwindcss';
+
+ @layer base {
+    html, body, #root { 
+      @apply h-full w-full;
+    }
+  
+    body {
+      @apply font-sans bg-gray-50;
+    }
+  }
+  
+  .profile-page {
+    @apply mx-auto p-4 md:p-8 grid gap-x-8 gap-y-6 min-h-full;
+    @apply w-full;
+    @apply pt-20;
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "header-area"
+      "action-area"
+      "map-area";
+  }
+  
+  @media (min-width: 768px) {
+    .profile-page {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr; 
+      grid-template-areas:
+        "header-area action-area"
+        "map-area action-area";
+    }
+  }
+  
+  /* 1. Header Section (Top Left) */
+  .safety-header {
+    @apply text-left mb-0;
+    grid-area: header-area;
+    /* --- NEW STYLES ADDED HERE --- */
+    @apply p-4 bg-white rounded-xl shadow-lg; 
+    /* ------------------------------ */
+  }
+  
+  .safety-header h1 {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-2;
+  }
+  
+  .safety-header .location-text {
+    @apply text-gray-500 text-lg md:text-xl;
+  }
+  
+  /* 2. Action Column (Right Side, Spans Rows) */
+  .action-column {
+    @apply flex flex-col items-center justify-center gap-6 p-4 bg-white rounded-xl shadow-lg; 
+    grid-area: action-area;
+    @apply h-full; /* Fill the height of the grid area */
+  }
+  
+  /* SOS Section */
+  .sos-section {
+    @apply flex justify-center w-full;
+  }
+  
+  .sos-button {
+    /* --- UPDATED STYLES FOR CIRCLE AND GLOW --- */
+    @apply bg-red-600 text-white font-extrabold text-2xl uppercase rounded-full transition duration-500;
+    /* Set fixed width and height for circle */
+    @apply w-32 h-32 md:w-40 md:h-40 flex items-center justify-center; 
+    /* Glowing shadow effect */
+    box-shadow: 0 0 20px 5px rgba(220, 38, 38, 0.7); /* Custom red glow */
+    /* Ensure text wraps or adjusts inside the small circle */
+    line-height: 1; 
+  }
+  .sos-button:hover {
+    @apply bg-red-700 shadow-2xl;
+  }
+  
+  /* Emergency Numbers */
+  .emergency-numbers {
+    @apply flex flex-col md:flex-row justify-between gap-4 w-full;
+  }
+  
+  .quick-action-button {
+    @apply bg-blue-600 text-white font-medium py-3 px-6 rounded-lg shadow-md transition duration-300 grow text-center;
+  }
+  .quick-action-button:hover {
+    @apply bg-blue-700;
+  }
+  
+  .quick-action-button.medical {
+    @apply bg-green-600;
+  }
+  .quick-action-button.medical:hover {
+    @apply bg-green-700;
+  }
+  
+  /* Navigation Actions */
+  .navigation-actions {
+    @apply flex flex-col md:flex-row justify-between gap-4 w-full;
+  }
+  
+  .quick-nav-button {
+    @apply bg-gray-800 text-white font-medium py-3 px-6 rounded-lg shadow-md transition duration-300 grow text-center;
+  }
+  .quick-nav-button:hover {
+    @apply bg-black;
+  }
+  
+  /* 3. Map Container (Bottom Left) */
+  .map-container {
+    @apply rounded-xl shadow-lg overflow-hidden h-full min-h-[200px];
+    grid-area: map-area;
+  }
+
+ /* Wrapper: centers the location row */
+.current-location-wrapper {
+  @apply flex items-center justify-start gap-2 mt-3 text-sm font-medium text-left;
+}
+
+/* MapPin icon */
+.current-location-icon {
+  @apply w-4 h-4 opacity-80;
+}
+
+/* Container for loading text + icon */
+.current-location-loading {
+  @apply flex items-center gap-1 text-black/70;
+}
+
+/* Loader icon */
+.loader-icon {
+  @apply w-4 h-4 animate-spin opacity-70;
+}
+
+/* Final location text (latitude, longitude) */
+.current-location-text {
+  @apply opacity-90;
+}

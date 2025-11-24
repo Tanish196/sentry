@@ -1,0 +1,70 @@
+@reference 'tailwindcss';
+
+
+/* 🔲 Dark Overlay */
+.add-path-overlay {
+  @apply fixed inset-0 z-2000 bg-black/70 backdrop-blur-sm
+         flex items-center justify-center p-4 transition-opacity;
+}
+
+
+/* 🪟 Modal Box (Black + White Border Glow) */
+.add-path-modal {
+  @apply bg-black text-white rounded-2xl border border-white/20
+         shadow-[0_0_25px_rgba(255,255,255,0.08)]
+         w-full max-w-lg p-6 md:p-8 relative;
+}
+
+
+/* ❌ Close Button */
+.add-path-close {
+  @apply absolute top-4 right-4 text-gray-300 hover:text-white transition;
+}
+
+
+/* 🏷 Header */
+.add-path-header {
+  @apply flex items-center mb-6 text-white;
+}
+
+.add-path-header h2 {
+  @apply text-2xl font-bold;
+}
+
+
+/* ⚠ Error Box */
+.add-path-error {
+  @apply mb-4 p-3 flex items-start rounded-lg text-sm 
+         bg-red-900/40 border border-red-500 text-red-300
+         shadow-[0_0_12px_rgba(255,0,0,0.25)];
+}
+
+
+/* 📝 Form Layout */
+.add-path-form {
+  @apply space-y-4 mb-6;
+}
+
+
+/* 🏷 Labels */
+.add-path-label {
+  @apply block text-sm font-semibold text-gray-300 mb-1;
+}
+
+
+/* ✏ Inputs (Black + White Border) */
+.add-path-input {
+  @apply w-full px-4 py-2 rounded-lg bg-black text-white
+         border border-white/20 shadow-inner shadow-white/5
+         focus:ring-2 focus:ring-white focus:border-white
+         disabled:bg-gray-800;
+}
+
+
+/* 🚀 Submit Button */
+.add-path-submit {
+  @apply w-full flex justify-center items-center py-3 px-4 rounded-lg
+         text-lg font-semibold bg-white text-black 
+         hover:bg-gray-200 transition
+         disabled:bg-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed;
+}

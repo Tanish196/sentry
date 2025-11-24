@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+ 
+  --color-black: #000000;      /* Canvas background */
+  --color-white: #ffffff;      /* Text */
+  
+  --color-panel: #1a1a1a;      /* Panel & container background */
+  --color-border: #2e2e2e;     /* Subtle borders */
+
+  /* Greys for spacing and card layering */
+  --color-grey-100: #f5f5f5;
+  --color-grey-400: #c7c7c7;
+  --color-grey-800: #2e2e2e;
+  --color-grey-900: #1a1a1a;
+
+  --font-sans: "Inter", sans-serif;
+  --radius-xl: 12px;
+}

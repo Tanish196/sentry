@@ -1,0 +1,50 @@
+@reference "tailwindcss";
+
+.header {
+  @apply w-full flex items-center justify-between
+         fixed top-0 left-0
+         bg-white/10  
+         px-4 md:px-8 py-3
+         z-50 border-b border-white/20
+         shadow-[0_10px_40px_rgba(255,255,255,0.2)];
+}
+
+
+
+/* Left Section */
+.left-header {
+  @apply flex items-center gap-3;
+}
+
+.left-header img {
+  @apply w-10 h-10 drop-shadow-lg;
+}
+
+.left-header h3 {
+  @apply text-xl font-semibold text-white drop-shadow;
+}
+
+/* Right Section */
+.right-header {
+  @apply flex items-center gap-4;
+}
+
+.action-button,
+.menu-toggle-button {
+  @apply bg-transparent p-1 cursor-pointer 
+         transition-transform duration-300;
+}
+
+/* === Make icons WHITE === */
+.profile-link-wrapper img,
+.menu-toggle-button img {
+  @apply w-8 h-8 transition duration-300;
+  filter: brightness(0) invert(1);  /* makes icons white */
+}
+
+/* === Beautiful hover animation === */
+.profile-link-wrapper img:hover,
+.menu-toggle-button img:hover {
+  @apply scale-110;
+  filter: brightness(10);  /* glow effect */
+}

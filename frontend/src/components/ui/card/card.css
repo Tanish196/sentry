@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* === Modern Black & White Card === */
+.ui-card {
+  @apply bg-white text-black p-6 rounded-2xl shadow-md 
+         transition-transform duration-300 ease-out 
+         hover:scale-105;
+}
+
+/* If using dark particle background */
+.ui-card.dark {
+  @apply bg-black/70 text-white backdrop-blur-md shadow-lg;
+}
+
+/* Optional: Card header or icon styling */
+.ui-card .card-header {
+  @apply text-xl font-semibold mb-2;
+}
+
+.ui-card .card-content {
+  @apply text-sm text-gray-700;
+}
+
+.ui-card.dark .card-content {
+  @apply text-gray-200;
+}

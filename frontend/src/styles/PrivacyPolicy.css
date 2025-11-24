@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/* ===== Main Container ===== */
+.privacy-policy-page {
+  @apply max-w-5xl mx-auto px-6 py-10
+         bg-black/40 backdrop-blur-xl
+         text-white
+         rounded-2xl shadow-xl mt-28 mb-10 leading-relaxed
+         border border-white/10;
+}
+
+/* ===== Header Section ===== */
+.privacy-policy-page h2 {
+  @apply text-3xl font-bold text-white mb-2 text-center drop-shadow-lg;
+}
+
+.privacy-policy-page > p:first-of-type {
+  @apply text-sm text-gray-300 text-center mb-8;
+}
+
+/* ===== Section Layout ===== */
+.policy-section {
+  @apply mb-10 bg-white/5 border border-white/10
+         rounded-xl p-6 backdrop-blur-lg shadow-md
+         transition-transform duration-200 hover:scale-[1.01];
+}
+
+.policy-section h3 {
+  @apply text-xl font-semibold text-white mb-4
+         border-b border-white/20 pb-2;
+}
+
+.policy-section p {
+  @apply text-gray-200 mb-3;
+}
+
+.policy-section ul {
+  @apply list-disc pl-6 space-y-2 text-gray-200;
+}
+
+.policy-section li strong {
+  @apply font-semibold text-white;
+}
+
+/* ===== Highlight Block ===== */
+.highlight {
+  @apply bg-yellow-500/20 border border-yellow-400/40 text-yellow-200
+         px-4 py-3 rounded-md mt-4 font-medium;
+}
+
+/* ===== Links ===== */
+.policy-section a {
+  @apply text-white underline underline-offset-2 font-medium
+         hover:text-gray-200;
+}
+
+/* ===== Responsive Tweaks ===== */
+@media (max-width: 640px) {
+  .privacy-policy-page {
+    @apply px-4 py-8 rounded-none shadow-none border-none;
+  }
+
+  .privacy-policy-page h2 {
+    @apply text-2xl;
+  }
+
+  .policy-section h3 {
+    @apply text-lg;
+  }
+
+  .policy-section {
+    @apply p-4;
+  }
+}

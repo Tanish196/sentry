@@ -1,0 +1,120 @@
+@reference 'tailwindcss';
+
+
+/* 🌍 Base layout → Black background + spacing under fixed header */
+.leaflet-container {
+  @apply relative flex flex-col lg:flex-row h-screen overflow-hidden bg-black w-full pt-24;
+}
+
+
+/* 🧭 Sidebar */
+.sidebar {
+  @apply p-5 bg-black border-r border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.05)]
+         lg:w-96 w-full shrink-0 z-10 lg:h-full overflow-y-auto text-white;
+}
+
+.sidebar-title {
+  @apply text-3xl font-extrabold text-white mb-2 flex items-center;
+}
+
+.sidebar-subtitle {
+  @apply text-sm text-gray-300 mb-4;
+}
+
+
+/* 🛣️ Route Info Cards */
+.route-info {
+  @apply bg-black border border-white/20 p-4 rounded-xl 
+         shadow-[0_0_15px_rgba(255,255,255,0.04)] mb-4;
+}
+
+.route-heading {
+  @apply text-lg font-semibold text-white mb-2;
+}
+
+.route-details {
+  @apply space-y-2 text-sm;
+}
+
+.label {
+  @apply font-medium text-gray-400 flex items-center;
+}
+
+.value {
+  @apply font-bold text-white ml-6;
+}
+
+
+/* ⚡ Status Cards */
+.status-card {
+  @apply p-4 mb-4 rounded-xl border flex items-center shadow-[0_0_12px_rgba(255,255,255,0.05)]
+         transition-all duration-500;
+}
+
+.status-text {
+  @apply font-bold text-sm text-white;
+}
+
+.status-green {
+  @apply bg-green-900/40 border-green-400 text-green-300;
+}
+
+.status-yellow {
+  @apply bg-yellow-900/40 border-yellow-400 text-yellow-200;
+}
+
+.status-red {
+  @apply bg-red-900/40 border-red-400 text-red-300 animate-pulse;
+}
+
+.status-gray {
+  @apply bg-gray-800 border-gray-500 text-gray-300;
+}
+
+
+/* 🧾 Info Block */
+.info-block {
+  @apply space-y-4 border-t border-white/20 pt-4;
+}
+
+.info-title {
+  @apply font-semibold text-gray-300 block mb-1;
+}
+
+.info-value {
+  @apply font-mono text-sm text-gray-200 bg-black border border-white/20 
+         p-2 rounded shadow-inner shadow-white/10;
+}
+
+.risk-score {
+  @apply font-extrabold text-3xl text-white;
+}
+
+.risk-note {
+  @apply text-xs text-gray-400 mt-1;
+}
+
+
+/* 🧪 Dev Mode Notice */
+.dev-mode {
+  @apply mt-8 p-3 text-xs bg-black border border-white/20 rounded-lg 
+         text-gray-400 italic shadow-[0_0_10px_rgba(255,255,255,0.03)];
+}
+
+
+/* 🗺️ Map Wrapper */
+.map-wrapper {
+  @apply relative grow w-full h-full bg-black;
+}
+
+.map-view {
+  @apply absolute inset-0 z-0;
+}
+
+
+/* ➕ Floating Button */
+.floating-btn {
+  @apply absolute bottom-5 right-5 bg-white text-black rounded-full w-12 h-12 
+         flex items-center justify-center shadow-xl 
+         hover:scale-105 active:scale-95 transition-transform duration-200 z-20;
+}

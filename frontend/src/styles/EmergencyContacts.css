@@ -1,0 +1,129 @@
+/* EmergencyContactsTailwind.css */
+@reference "tailwindcss";
+
+/* -------------------------------
+   Main Page Container
+--------------------------------*/
+.emergency-contacts-page {
+ @apply max-w-6xl mx-auto p-6 sm:p-20  flex flex-col gap-10 min-h-screen pt-28;
+}
+
+/* Page Heading */
+.emergency-contacts-page h2 {
+  @apply text-3xl sm:text-4xl font-bold text-white mb-4 text-center;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+}
+
+/* -------------------------------
+   Back Button
+--------------------------------*/
+.back-button {
+  @apply mb-6 inline-flex items-center gap-2 px-4 py-2 border-2 border-white rounded-full 
+         text-white font-medium text-base transition duration-300
+         hover:bg-white hover:text-black hover:scale-105;
+}
+
+/* -------------------------------
+   Section Headings
+--------------------------------*/
+.medical-info-section h3,
+.contacts-list-section h3,
+.add-contact-section h3 {
+  @apply text-xl sm:text-2xl font-semibold text-white mb-4;
+}
+
+/* -------------------------------
+   Medical Info Section
+--------------------------------*/
+.medical-info-section {
+  @apply bg-black border border-white p-6 rounded-2xl 
+         shadow-[0_0_18px_rgba(255,255,255,0.08)] flex flex-col gap-4;
+}
+
+.medical-info-section textarea {
+  @apply w-full p-4 border-2 border-white rounded-xl bg-black text-white 
+         placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white
+         transition-all duration-300 hover:border-gray-400;
+}
+
+.info-display p {
+  @apply text-gray-300;
+}
+
+.info-display button,
+.medical-info-section button {
+  @apply mt-2 self-start px-5 py-2 bg-white text-black rounded-xl font-semibold 
+         hover:bg-gray-200 transition duration-300 hover:scale-105;
+}
+
+/* -------------------------------
+   Contacts List
+--------------------------------*/
+.contacts-list-section {
+  @apply flex flex-col gap-4;
+}
+
+.contact-card {
+  @apply bg-black border border-white p-4 sm:p-6 rounded-2xl 
+         shadow-[0_0_15px_rgba(255,255,255,0.06)]
+         flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6
+         transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.15)];
+}
+
+.contact-card input {
+  @apply p-3 border-2 border-white rounded-xl bg-black text-white flex-1
+         placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white
+         transition-all duration-300 hover:border-gray-400;
+}
+
+.delete-button {
+  @apply px-4 py-2 bg-red-600 text-white rounded-xl font-semibold 
+         hover:bg-red-700 transition duration-300 self-end sm:self-auto;
+}
+
+/* -------------------------------
+   Add Contact Section
+--------------------------------*/
+.add-contact-section {
+  @apply bg-black border border-white p-6 rounded-2xl 
+         shadow-[0_0_18px_rgba(255,255,255,0.08)] flex flex-col gap-4;
+}
+
+.contact-input-form {
+  @apply flex flex-col sm:flex-row gap-4 sm:gap-6 flex-wrap;
+}
+
+.contact-input-form input {
+  @apply p-3 border-2 border-white rounded-xl bg-black text-white flex-1
+         placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white
+         transition-all duration-300 hover:border-gray-400;
+}
+
+.contact-input-form button {
+  @apply px-6 py-3 bg-white text-black rounded-2xl font-semibold 
+         hover:bg-gray-200 transition duration-300 hover:scale-105 self-start sm:self-auto;
+}
+
+/* -------------------------------
+   Divider
+--------------------------------*/
+hr {
+  @apply border-gray-700 my-6;
+}
+
+/* -------------------------------
+   Responsive
+--------------------------------*/
+@media (max-width: 640px) {
+  .contact-card {
+    @apply flex-col items-start;
+  }
+
+  .contact-input-form {
+    @apply flex-col gap-4;
+  }
+
+  .back-button {
+    @apply w-full justify-center;
+  }
+}

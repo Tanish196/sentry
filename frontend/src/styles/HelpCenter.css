@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+/* ===== Page Background ===== */
+body {
+  @apply bg-black text-white;
+}
+
+/* ===== Page Container ===== */
+.help-center-page {
+  @apply max-w-5xl mx-auto px-6 py-16 
+         text-white
+         mt-24 mb-20 leading-relaxed;
+}
+
+/* ===== Header Section ===== */
+.help-center-page h2 {
+  @apply text-4xl font-extrabold text-white mb-3 text-center;
+}
+
+.help-center-page > p {
+  @apply text-gray-300 text-center mb-10;
+}
+
+/* ===== Help Sections ===== */
+.help-section {
+  @apply mb-12;
+}
+
+.help-section h3 {
+  @apply text-2xl font-semibold text-white mb-4 
+         border-b border-gray-700 pb-2;
+}
+
+/* ===== Each Help Item ===== */
+.help-item {
+  @apply mb-6 bg-[#111] border border-gray-800 rounded-xl 
+         p-6 transition-transform duration-200 hover:scale-[1.01]
+         shadow-md shadow-black/40;
+}
+
+.help-item h4 {
+  @apply text-lg font-semibold text-white mb-2;
+}
+
+.help-item p {
+  @apply text-gray-300;
+}
+
+/* ===== Note Box ===== */
+.note {
+  @apply bg-yellow-900/20 border border-yellow-500 text-yellow-400
+         px-4 py-2 rounded-md mt-3 font-medium;
+}
+
+/* ===== Links ===== */
+.help-item a {
+  @apply text-white underline underline-offset-2 font-medium hover:text-gray-300;
+}
+
+/* ===== Responsive Tweaks ===== */
+@media (max-width: 640px) {
+  .help-center-page {
+    @apply px-4 py-10;
+  }
+
+  .help-center-page h2 {
+    @apply text-3xl;
+  }
+
+  .help-section h3 {
+    @apply text-xl;
+  }
+
+  .help-item {
+    @apply p-4;
+  }
+}

@@ -1,0 +1,76 @@
+@reference 'tailwindcss';
+
+.details-page {
+  @apply min-h-screen bg-linear-to-br from-gray-100 to-gray-300 
+    flex justify-center items-center py-16 px-6;
+}
+
+
+.details-card {
+  @apply w-full max-w-5xl bg-white/80 backdrop-blur-xl text-gray-900 
+    p-12 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] 
+    space-y-12 border border-white/40;
+}
+
+.details-title {
+  @apply text-4xl font-bold tracking-wide text-center text-gray-800 mb-10;
+}
+
+.details-grid {
+  @apply grid grid-cols-2 gap-10;
+}
+
+.detail-item {
+  @apply flex items-start gap-6 bg-white p-6 rounded-2xl shadow-lg 
+    border border-gray-200 transition-all duration-300
+    hover:shadow-xl hover:-translate-y-1;
+}
+
+.detail-icon {
+  @apply w-10 h-10 text-gray-700 opacity-70 transition-all duration-300 
+    group-hover:opacity-100;
+}
+
+.detail-label {
+  @apply text-xs uppercase text-gray-500 tracking-wider;
+}
+
+.detail-value {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+@media (max-width: 1024px) {
+  .details-grid {
+    @apply grid-cols-1;
+  }
+
+  .details-card {
+    @apply p-10;
+  }
+
+  .details-title {
+    @apply text-3xl;
+  }
+}
+
+@media (max-width: 640px) {
+  .details-card {
+    @apply p-8 rounded-2xl;
+  }
+
+  .detail-item {
+    @apply p-5 gap-4;
+  }
+
+  .detail-value {
+    @apply text-lg;
+  }
+
+  .detail-icon {
+    @apply w-8 h-8;
+  }
+
+  .details-title {
+    @apply text-2xl;
+  }
+}

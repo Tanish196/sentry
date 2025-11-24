@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Page wrapper helps overlay on animation */
+.page-wrapper {
+  @apply relative z-10 w-full h-screen flex items-center justify-center;
+}
+
+/* Whole page container */
+.login-container {
+  @apply w-full flex items-center justify-center px-4;
+}
+
+/* Card matches home page black theme */
+.login-card {
+  @apply w-[90%] sm:w-[380px] bg-black text-white 
+         border border-white rounded-2xl p-6 
+         shadow-[0_0_20px_rgba(255,255,255,0.15)]
+         backdrop-blur-sm flex flex-col gap-5;
+}
+
+/* Title */
+.login-title {
+  @apply text-2xl font-bold text-center text-white;
+}
+
+/* Form */
+.login-form {
+  @apply flex flex-col gap-4;
+}
+
+.login-label {
+  @apply text-sm font-medium text-white;
+}
+
+.login-input {
+  @apply w-full bg-transparent border border-white 
+         text-white px-3 py-2 rounded-lg
+         focus:outline-none focus:ring-2 focus:ring-white;
+}
+
+/* Button */
+.login-button {
+  @apply w-full bg-white text-black py-2 rounded-xl font-semibold
+         hover:opacity-80 transition;
+}
+
+/* Signup link */
+.signup-link-text {
+  @apply text-center text-white text-sm;
+}
+
+.signup-link {
+  @apply underline underline-offset-2 font-medium hover:text-gray-300;
+}
