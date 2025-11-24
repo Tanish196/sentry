@@ -280,7 +280,8 @@ while (true) {
 
   // Higher score is better, longer time reduces safety
   const combined = safeScore / diffMinutes;
-
+  console.log(combined);
+  console.log(threshold);
   // Consider safe if combined >= threshold
   return combined >= threshold;
 }
