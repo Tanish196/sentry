@@ -24,7 +24,7 @@ export default function GlobalMenu({ isOpen, onClose }) {
                 <section className="menu-section">
                     <h3>Travel Tools</h3>
                     <ul>
-                        <li><Link to="/live-tracking" onClick={onClose}>Home / Safety Map</Link></li>
+                        <li><Link to="/map" onClick={onClose}>Home / Safety Map</Link></li>
                         <li><Link to="/emergency-contacts" onClick={onClose}>Update Emergency Contacts</Link></li>
                     </ul>
                 </section>

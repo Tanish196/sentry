@@ -14,14 +14,11 @@ import EmergencyContacts from "@/pages/EmergencyContacts"
 import HelpCenter from '@/pages/HelpCenter'
 import PrivacyPolicy from '@/pages/PrivacyPolicy'
 import Login from "@/pages/Login";
-
-
-
+import LeafletMapViewer from "@/pages/LeafletMapViewer";
 
 import "@/App.css"
 
-export default function App(){
-  
+export default function App(){  
   return(
     <>
       <Router>
@@ -39,6 +36,7 @@ export default function App(){
             <Route path="/login" element={<Login />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/profile-details" element={<ProfileDetails />} />
+            <Route path="/map" element={<LeafletMapViewer />} />
           </Routes>
         </RegistrationProvider>
       </Router>

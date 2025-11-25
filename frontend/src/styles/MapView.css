@@ -1,0 +1,617 @@
+/* MapView.css */
+.map-view-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.map-container {
+  flex: 1;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Route Panel Styles */
+.route-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 320px;
+  max-height: calc(100vh - 20px);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.panel-header h3 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.panel-header p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Input Section */
+.input-section {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-group small {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.input-hint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.link-button:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* Avoid Options */
+.avoid-options {
+  margin-bottom: 20px;
+}
+
+.avoid-options h4 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.checkmark.forbidden {
+  background-color: #fee2e2;
+  border: 2px solid #ef4444;
+}
+
+.checkmark.caution {
+  background-color: #fed7aa;
+  border: 2px solid #f97316;
+}
+
+/* Layer Toggles */
+.layer-toggles {
+  margin-bottom: 20px;
+}
+
+.layer-toggles h4 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.panel-hint {
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+}
+
+.toggle-label {
+  position: relative;
+}
+
+.toggle-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.toggle-slider {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  margin-right: 8px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider.forbidden {
+  background-color: #ef4444;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider.caution {
+  background-color: #f97316;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider.safe {
+  background-color: #22c55e;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider.police-boundary {
+  background-color: #0ea5e9;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider.police-station {
+  background-color: #3b82f6;
+}
+
+.toggle-label input[type="checkbox"]:not(:checked) + .toggle-slider {
+  background-color: #d1d5db;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider::before {
+  transform: translateX(16px);
+}
+
+.advanced-options {
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background-color: #f9fafb;
+}
+
+.advanced-options summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #374151;
+  outline: none;
+}
+
+.advanced-options[open] {
+  background-color: #f3f4f6;
+}
+
+.advanced-options[open] summary {
+  margin-bottom: 8px;
+}
+
+.advanced-note {
+  display: block;
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.primary-button {
+  flex: 1;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primary-button:hover {
+  background-color: #2563eb;
+}
+
+.secondary-button {
+  flex: 1;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.secondary-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* Tracking Toggle */
+.tracking-toggle {
+  margin-bottom: 20px;
+}
+
+.tracking-note {
+  display: block;
+  margin-top: 8px;
+  color: #059669;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.loading-hint {
+  display: block;
+  margin-top: 8px;
+  color: #2563eb;
+  font-size: 12px;
+}
+
+.error-text {
+  display: block;
+  margin-top: 8px;
+  color: #dc2626;
+  font-size: 12px;
+}
+
+/* Route Summary */
+.route-summary {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+
+.route-summary h4 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.segment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.segment-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: #f9fafb;
+  border-left: 3px solid #d1d5db;
+}
+
+.segment-item.forbidden {
+  background-color: #fef2f2;
+  border-left-color: #ef4444;
+}
+
+.segment-item.caution {
+  background-color: #fff7ed;
+  border-left-color: #f97316;
+}
+
+.segment-item.safe {
+  background-color: #f0fdf4;
+  border-left-color: #22c55e;
+}
+
+.segment-number {
+  font-weight: 500;
+  margin-right: 8px;
+  color: #374151;
+}
+
+.segment-risk {
+  font-weight: 600;
+  margin-right: 8px;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.segment-risk.forbidden {
+  background-color: #ef4444;
+  color: white;
+}
+
+.segment-risk.caution {
+  background-color: #f97316;
+  color: white;
+}
+
+.segment-risk.safe {
+  background-color: #22c55e;
+  color: white;
+}
+
+.segment-zones {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.station-popup {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.station-popup strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.warning-modal .modal-header {
+  padding: 24px 24px 0 24px;
+}
+
+.warning-modal .modal-header h2 {
+  margin: 0;
+  color: #dc2626;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.warning-modal .modal-body {
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.warning-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.warning-details {
+  text-align: left;
+}
+
+.warning-message {
+  font-size: 16px;
+  color: #374151;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.zone-info {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.zone-info h3 {
+  margin: 0 0 12px 0;
+  color: #dc2626;
+  font-size: 16px;
+}
+
+.zone-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.zone-info li {
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+.risk-badge.forbidden {
+  background-color: #ef4444;
+}
+
+.warning-text {
+  margin-bottom: 16px;
+}
+
+.warning-text p {
+  margin: 0 0 12px 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.consent-note {
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  color: #92400e;
+}
+
+.modal-footer {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.danger-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.danger-button:hover {
+  background-color: #b91c1c;
+}
+
+/* Geofence Alert Styles */
+.geofence-alert {
+  animation: slideIn 0.3s ease-out;
+}
+
+.geofence-alert.entry.forbidden {
+  border-color: #ef4444;
+}
+
+.geofence-alert.entry.caution {
+  border-color: #f97316;
+}
+
+.geofence-alert.entry.safe {
+  border-color: #22c55e;
+}
+
+.geofence-alert.exit {
+  border-color: #6b7280;
+}
+
+.alert-content {
+  line-height: 1.4;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .route-panel {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+}
