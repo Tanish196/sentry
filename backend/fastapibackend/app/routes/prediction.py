@@ -17,9 +17,9 @@ from ..schemas.prediction import (
     PredictAllRequest,
     PredictAllResponse,
 )
-from ..services.gemini_service import fetch_aqi_from_gemini
 from ..services.prediction_service import predict_safety, extract_weather_features
 from ..services.weather_service import fetch_weather_and_aqi
+from ..services.waqi_service import fetch_aqi_from_waqi
 from ..models import get_model_artifacts
 
 LOGGER = logging.getLogger(__name__)
@@ -116,19 +116,20 @@ async def predict_single(request: SingleLocationRequest):
                 settings.air_pollution_url
             )
         
-        # Get AQI from Gemini for this specific station
-        aqi_dict = await fetch_aqi_from_gemini(
-            [request.police_station],
-            settings.gemini_api_key,
-            settings.gemini_api_url
+        # Get AQI from WAQI for this specific station
+        aqi_response = await fetch_aqi_from_waqi(
+            settings.waqi_api_token,
+            stations=[request.police_station]
         )
-        gemini_aqi = aqi_dict.get(request.police_station, 150.0)
+        station_key = request.police_station.lower()
+        station_entry = aqi_response.get(station_key)
+        station_aqi = station_entry.get("aqi", 150.0) if station_entry else 150.0
         
-        # Override the weather bundle AQI with Gemini's value
-        weather_bundle["aqi"] = gemini_aqi
+        # Override the weather bundle AQI with WAQI value
+        weather_bundle["aqi"] = station_aqi
         
         # Extract weather features
-        weather_features = extract_weather_features(weather_bundle["weather"], gemini_aqi)
+        weather_features = extract_weather_features(weather_bundle["weather"], station_aqi)
         
         # Build feature row
         feature_row = {
@@ -147,8 +148,8 @@ async def predict_single(request: SingleLocationRequest):
             "Avg Wind Speed": weather_features["wind_speed"],
             "Min Wind Speed": weather_features["wind_speed"],
             "Total Precipitation": weather_features["precipitation"],
-            "aqi": gemini_aqi,
-            "aqi_median": gemini_aqi,
+            "aqi": station_aqi,
+            "aqi_median": station_aqi,
         }
         
         labels, probabilities = predict_safety([feature_row], model, preprocessor, label_encoder)
@@ -160,7 +161,7 @@ async def predict_single(request: SingleLocationRequest):
             "temp": weather_features["temp_avg"],
             "humidity": weather_features["humidity"],
             "wind_speed": weather_features["wind_speed"],
-            "aqi": gemini_aqi,
+            "aqi": station_aqi,
         }
         
         return SinglePredictionResponse(
@@ -191,11 +192,10 @@ async def predict_all(request: PredictAllRequest):
                 settings.air_pollution_url
             )
         
-        # Get AQI from Gemini for all stations
-        aqi_dict = await fetch_aqi_from_gemini(
-            DELHI_POLICE_STATIONS,
-            settings.gemini_api_key,
-            settings.gemini_api_url
+        # Get AQI from WAQI for all stations
+        aqi_dict = await fetch_aqi_from_waqi(
+            settings.waqi_api_token,
+            stations=DELHI_POLICE_STATIONS
         )
         
         # Extract weather features
@@ -207,7 +207,9 @@ async def predict_all(request: PredictAllRequest):
         # Build feature rows for all police stations
         feature_rows = []
         for station in DELHI_POLICE_STATIONS:
-            station_aqi = aqi_dict.get(station, 150.0)  # Default to 150 if not found
+            station_key = station.lower()
+            station_entry = aqi_dict.get(station_key)
+            station_aqi = station_entry.get("aqi", 150.0) if station_entry else 150.0
             
             feature_row = {
                 "month": request.month,
@@ -236,7 +238,8 @@ async def predict_all(request: PredictAllRequest):
         # Build response
         predictions = []
         for station, label, probs in zip(DELHI_POLICE_STATIONS, labels, probabilities):
-            station_aqi = aqi_dict.get(station, 150.0)
+            station_entry = aqi_dict.get(station.lower())
+            station_aqi = station_entry.get("aqi", 150.0) if station_entry else 150.0
             prob_map = {cls: float(prob) for cls, prob in zip(label_encoder.classes_, probs)}
             weather_snapshot = {
                 "temp": weather_features["temp_avg"],
