@@ -12,7 +12,8 @@ const RoutePanel = ({
   isTracking,
   setIsTracking,
   routeSegments,
-  userLocation
+  userLocation,
+  routeLoading
 }) => {
   const [startInput, setStartInput] = useState('');
   const [endInput, setEndInput] = useState('');
@@ -21,25 +22,30 @@ const RoutePanel = ({
   const formatCoords = (coords) => `${coords.lat.toFixed(5)},${coords.lng.toFixed(5)}`;
 
   const handleGetRoute = () => {
-    // Parse coordinates from input (format: "lat,lng" or "lat lng")
-    const parseCoords = (input) => {
-      const parts = input.replace(/\s+/g, '').split(',');
-      if (parts.length !== 2) return null;
-
-      const lat = parseFloat(parts[0]);
-      const lng = parseFloat(parts[1]);
-
-      if (isNaN(lat) || isNaN(lng)) return null;
-      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
-
-      return { lat, lng };
+    // Try to parse as coordinates first, otherwise treat as location name
+    const parseInput = (input) => {
+      const trimmed = input.trim();
+      
+      // Try parsing as coordinates (format: "lat,lng" or "lat lng")
+      const parts = trimmed.replace(/\s+/g, '').split(',');
+      if (parts.length === 2) {
+        const lat = parseFloat(parts[0]);
+        const lng = parseFloat(parts[1]);
+        
+        if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+          return { lat, lng };
+        }
+      }
+      
+      // Otherwise, treat as location name
+      return trimmed;
     };
 
-    const start = parseCoords(startInput);
-    const end = parseCoords(endInput);
+    const start = parseInput(startInput);
+    const end = parseInput(endInput);
 
-    if (!start || !end) {
-      alert('Please enter valid coordinates in format: lat,lng (e.g., 28.7041,77.1025)');
+    if (!start || !end || start === '' || end === '') {
+      alert('Please enter location names or coordinates (e.g., "Connaught Place, Delhi" or "28.7041,77.1025")');
       return;
     }
 
@@ -73,7 +79,6 @@ const RoutePanel = ({
     <div className="route-panel">
       <div className="panel-header">
         <h3>Safe Route Planner</h3>
-        <p>Plan routes avoiding high-risk areas</p>
       </div>
 
       <div className="input-section">
@@ -82,12 +87,12 @@ const RoutePanel = ({
           <input
             id="start-input"
             type="text"
-            placeholder="28.7041,77.1025"
+            placeholder="Connaught Place, Delhi"
             value={startInput}
             onChange={(e) => setStartInput(e.target.value)}
           />
           <div className="input-hint-row">
-            <small>Format: latitude,longitude</small>
+            <small>Enter location name or coordinates (lat,lng)</small>
             <button
               type="button"
               className="link-button"
@@ -104,15 +109,15 @@ const RoutePanel = ({
           <input
             id="end-input"
             type="text"
-            placeholder="28.6139,77.2090"
+            placeholder="India Gate, Delhi"
             value={endInput}
             onChange={(e) => setEndInput(e.target.value)}
           />
-          <small>Format: latitude,longitude</small>
+          <small>Enter location name or coordinates (lat,lng)</small>
         </div>
       </div>
 
-      <details className="advanced-options">
+      {/* <details className="advanced-options">
         <summary>Advanced routing preferences</summary>
         <div className="avoid-options">
           <div className="checkbox-group">
@@ -138,7 +143,7 @@ const RoutePanel = ({
           </div>
           <small className="advanced-note">These preferences are forwarded to the backend once routing APIs are wired up.</small>
         </div>
-      </details>
+      </details> */}
 
       <div className="layer-toggles">
         <h4>Show Layers</h4>
@@ -208,10 +213,17 @@ const RoutePanel = ({
       </div>
 
       <div className="action-buttons">
-        <Button onClick={handleGetRoute} className="primary-button">
-          Get Safe Route
+        <Button onClick={handleGetRoute} className="primary-button" disabled={routeLoading}>
+          {routeLoading ? (
+            <>
+              Calculating Route...
+              <span className="loading-spinner"></span>
+            </>
+          ) : (
+            'Get Safe Route'
+          )}
         </Button>
-        <Button onClick={handleClearRoute} className="secondary-button">
+        <Button onClick={handleClearRoute} className="secondary-button" disabled={routeLoading}>
           Clear Route
         </Button>
       </div>
@@ -232,27 +244,6 @@ const RoutePanel = ({
           </small>
         )}
       </div>
-
-      {routeSegments.length > 0 && (
-        <div className="route-summary">
-          <h4>Route Analysis</h4>
-          <div className="segment-list">
-            {routeSegments.map((segment, idx) => (
-              <div key={idx} className={`segment-item ${segment.risk}`}>
-                <span className="segment-number">Segment {idx + 1}</span>
-                <span className={`segment-risk ${segment.risk}`}>
-                  {segment.risk.toUpperCase()}
-                </span>
-                {segment.zones.length > 0 && (
-                  <span className="segment-zones">
-                    ({segment.zones.join(', ')})
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

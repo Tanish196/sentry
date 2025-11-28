@@ -21,6 +21,7 @@ from ..services.prediction_service import predict_safety, extract_weather_featur
 from ..services.weather_service import fetch_weather_and_aqi
 from ..services.waqi_service import fetch_aqi_from_waqi
 from ..models import get_model_artifacts
+from ..services.routing_service import geocode_location as geocode_service
 
 LOGGER = logging.getLogger(__name__)
 
@@ -28,7 +29,6 @@ router = APIRouter(tags=["prediction"])
 
 
 def _extract_feature_row(location: LocationRequest, bundle: Dict) -> Dict[str, float | str]:
-    """Extract feature row from location and weather bundle."""
     weather_features = extract_weather_features(bundle["weather"], bundle["aqi"])
     
     return {
@@ -116,7 +116,6 @@ async def predict_single(request: SingleLocationRequest):
                 settings.air_pollution_url
             )
         
-        # Get AQI from WAQI for this specific station
         aqi_response = await fetch_aqi_from_waqi(
             settings.waqi_api_token,
             stations=[request.police_station]
@@ -125,13 +124,10 @@ async def predict_single(request: SingleLocationRequest):
         station_entry = aqi_response.get(station_key)
         station_aqi = station_entry.get("aqi", 150.0) if station_entry else 150.0
         
-        # Override the weather bundle AQI with WAQI value
         weather_bundle["aqi"] = station_aqi
         
-        # Extract weather features
         weather_features = extract_weather_features(weather_bundle["weather"], station_aqi)
         
-        # Build feature row
         feature_row = {
             "month": request.month,
             "day": request.day,
@@ -182,7 +178,7 @@ async def predict_all(request: PredictAllRequest):
     model, preprocessor, label_encoder = get_model_artifacts()
     
     try:
-        # Fetch weather data for Delhi once
+        # Fetch weather 
         async with httpx.AsyncClient(timeout=20.0) as client:
             weather_bundle = await fetch_weather_and_aqi(
                 client,
@@ -192,7 +188,7 @@ async def predict_all(request: PredictAllRequest):
                 settings.air_pollution_url
             )
         
-        # Get AQI from WAQI for all stations
+        # Get AQI
         aqi_dict = await fetch_aqi_from_waqi(
             settings.waqi_api_token,
             stations=DELHI_POLICE_STATIONS
@@ -232,10 +228,8 @@ async def predict_all(request: PredictAllRequest):
             }
             feature_rows.append(feature_row)
         
-        # Make predictions for all stations
         labels, probabilities = predict_safety(feature_rows, model, preprocessor, label_encoder)
         
-        # Build response
         predictions = []
         for station, label, probs in zip(DELHI_POLICE_STATIONS, labels, probabilities):
             station_entry = aqi_dict.get(station.lower())
@@ -269,3 +263,60 @@ async def predict_all(request: PredictAllRequest):
     except Exception as e:
         LOGGER.error(f"Predict-all failed: {e}")
         raise HTTPException(status_code=500, detail=f"Predict-all failed: {str(e)}")
+
+
+@router.post("/geocode")
+async def geocode_location(request: dict):
+    """
+    Convert a location name/address to coordinates using Nominatim API.
+    
+    Request body:
+        - location: Location name or address string
+    
+    Returns:
+        - lat: Latitude
+        - lng: Longitude
+        - display_name: Full address
+    """
+    try:
+        location = request.get("location")
+        if not location:
+            raise HTTPException(status_code=400, detail="location parameter required")
+        
+        return await geocode_service(location)
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        LOGGER.error(f"Geocoding failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Geocoding failed: {str(e)}")
+
+
+@router.post("/log-entry")
+async def log_geofence_entry(request: dict):
+    """Log when user enters a geofence area."""
+    try:
+        LOGGER.info(f"Geofence entry: {request}")
+        return {
+            "success": True,
+            "message": "Entry logged",
+            "alert_id": f"entry_{request.get('geofence_id', 'unknown')}_{request.get('timestamp', '')}"
+        }
+    except Exception as e:
+        LOGGER.error(f"Failed to log entry: {e}")
+        return {"success": False, "message": str(e)}
+
+
+@router.post("/log-exit")
+async def log_geofence_exit(request: dict):
+    """Log when user exits a geofence area."""
+    try:
+        LOGGER.info(f"Geofence exit: {request}")
+        return {
+            "success": True,
+            "message": "Exit logged",
+            "alert_id": f"exit_{request.get('geofence_id', 'unknown')}_{request.get('timestamp', '')}"
+        }
+    except Exception as e:
+        LOGGER.error(f"Failed to log exit: {e}")
+        return {"success": False, "message": str(e)}

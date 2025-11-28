@@ -10,10 +10,6 @@ export default function AddPathModal({ isVisible, onClose, onStartTracking }) {
   const [error, setError] = useState(null);
 
   if (!isVisible) return null;
-
-  // ===========================
-  // 📍 GET CURRENT GPS LOCATION
-  // ===========================
   const fillWithGPS = () => {
     setGpsLoading(true);
     setError(null);
@@ -51,9 +47,7 @@ export default function AddPathModal({ isVisible, onClose, onStartTracking }) {
     );
   };
 
-  // ====================================
-  // 🔥 SEND DESTINATION TO BACKEND API
-  // ====================================
+
   const sendDestinationToAPI = async (destinationValue) => {
     const token = localStorage.getItem("token");
 

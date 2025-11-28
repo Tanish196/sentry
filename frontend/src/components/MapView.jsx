@@ -3,12 +3,13 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle } from 'react-
 import L from 'leaflet';
 import * as turf from '@turf/turf';
 import 'leaflet/dist/leaflet.css';
-import GeofenceLayer from './GeofenceLayer';
+import SafetyLayer from './SafetyLayer';
 import RoutePanel from './RoutePanel';
 import LocationTracker from './LocationTracker';
 import DestinationWarningModal from './DestinationWarningModal';
 import PoliceLayer from './PoliceLayer';
-import { mockGeofences, mockRouteResponse, DELHI_CENTER, DEFAULT_ZOOM } from '../utils/mockMapData';
+import { useSafetyAreas } from '../hooks/useSafetyAreas';
+import { DELHI_CENTER, DEFAULT_ZOOM } from '../utils/mockMapData';
 import '../styles/MapView.css';
 
 // Fix Leaflet default marker icon issue
@@ -38,19 +39,22 @@ const endIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-const MapView = () => {
-  const [geofences, setGeofences] = useState(mockGeofences);
+const MapView = ({ start, destination }) => {
+  const { data: safetyData, loading: safetyLoading, error: safetyError } = useSafetyAreas({
+    useCurrentConditions: true,
+  });
   const [route, setRoute] = useState(null);
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
+  const [routeLoading, setRouteLoading] = useState(false);
   const [layerToggles, setLayerToggles] = useState({
     forbidden: true,
     caution: true,
-    safe: false
+    safe: true
   });
   const [policeLayerToggles, setPoliceLayerToggles] = useState({
     boundaries: true,
-    stations: true
+    stations: false
   });
   const [isTracking, setIsTracking] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
@@ -60,6 +64,14 @@ const MapView = () => {
   const [policeBoundaries, setPoliceBoundaries] = useState(null);
   const [policeStations, setPoliceStations] = useState(null);
   const [policeDataStatus, setPoliceDataStatus] = useState('loading');
+
+  const visibleRiskLevels = useMemo(() => {
+    const levels = new Set();
+    if (layerToggles.safe) levels.add('safe');
+    if (layerToggles.caution) levels.add('caution');
+    if (layerToggles.forbidden) levels.add('forbidden');
+    return levels;
+  }, [layerToggles]);
 
   useEffect(() => {
     let isMounted = true;
@@ -86,7 +98,6 @@ const MapView = () => {
           setPoliceDataStatus('ready');
         }
       } catch (error) {
-        console.error('Failed loading police overlays', error);
         if (isMounted) {
           setPoliceDataStatus('error');
         }
@@ -99,6 +110,14 @@ const MapView = () => {
       isMounted = false;
     };
   }, []);
+
+  // Auto-generate route when start and destination props are provided
+  useEffect(() => {
+    if (start && destination && start !== 'Awaiting Route...' && destination !== 'Awaiting Route...') {
+      // Automatically generate route with location names
+      handleGetRoute(start, destination, ['forbidden']);
+    }
+  }, [start, destination]);
 
   const policeStationAreaIndex = useMemo(() => {
     if (!policeBoundaries?.features) return {};
@@ -120,8 +139,10 @@ const MapView = () => {
 
   // Check if a point is inside a forbidden geofence
   const checkPointInForbiddenZone = (latLng) => {
+    if (!safetyData?.features) return null;
+
     const point = turf.point([latLng.lng, latLng.lat]);
-    const forbiddenGeofences = geofences.features.filter(
+    const forbiddenGeofences = safetyData.features.filter(
       f => f.properties.risk_level === 'forbidden'
     );
 
@@ -135,63 +156,191 @@ const MapView = () => {
   };
 
   // Handle route request
-  const handleGetRoute = (start, end, avoidRiskLevels) => {
-    console.log('Requesting route:', { start, end, avoidRiskLevels });
+  const handleGetRoute = async (start, end, avoidRiskLevels) => {
+
+    // If end is a string (location name), geocode it first to check for forbidden zone
+    let endCoords = end;
+    if (typeof end === 'string') {
+      try {
+        const geocodeRes = await fetch('http://localhost:8000/api/geocode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ location: end }),
+        });
+        const geocodeData = await geocodeRes.json();
+        endCoords = { lat: geocodeData.lat, lng: geocodeData.lng };
+      } catch (error) {
+        // Continue anyway, let backend handle it
+      }
+    }
 
     // Check if destination is in forbidden zone
-    const forbiddenZone = checkPointInForbiddenZone(end);
-    if (forbiddenZone) {
-      setWarningDetails({
-        zone: forbiddenZone,
-        destination: end,
-        onProceed: () => {
-          generateRoute(start, end, avoidRiskLevels, true);
-          setShowWarningModal(false);
-        }
-      });
-      setShowWarningModal(true);
-      return;
+    if (typeof endCoords === 'object' && endCoords.lat && endCoords.lng) {
+      const forbiddenZone = checkPointInForbiddenZone(endCoords);
+      if (forbiddenZone) {
+        setWarningDetails({
+          zone: forbiddenZone,
+          destination: endCoords,
+          onProceed: () => {
+            generateRoute(start, end, avoidRiskLevels, true);
+            setShowWarningModal(false);
+          }
+        });
+        setShowWarningModal(true);
+        return;
+      }
     }
 
     generateRoute(start, end, avoidRiskLevels, false);
   };
 
-  // Generate route (mock implementation)
-  const generateRoute = (start, end, avoidRiskLevels, userConsent) => {
-    setStartPoint(start);
-    setEndPoint(end);
+  // Generate route using backend API
+  const generateRoute = async (start, end, avoidRiskLevels, userConsent) => {
+    setRouteLoading(true);
 
-    // In production, this would call /api/route with avoid_polygons
-    // For now, use mock data
-    const mockRoute = {
-      ...mockRouteResponse.route,
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [start.lng, start.lat],
-          ...mockRouteResponse.route.geometry.coordinates.slice(1, -1),
-          [end.lng, end.lat]
-        ]
+    try {
+      // Determine if start/end are location strings or coordinate objects
+      let startPayload, endPayload;
+      
+      if (typeof start === 'string') {
+        // Start is a location name - send as string to backend
+        startPayload = start;
+        // Geocode to get coordinates for marker display
+        try {
+          const geocodeRes = await fetch('http://localhost:8000/api/geocode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: start }),
+          });
+          if (geocodeRes.ok) {
+            const geocodeData = await geocodeRes.json();
+            if (geocodeData && geocodeData.lat && geocodeData.lng) {
+              setStartPoint({ lat: geocodeData.lat, lng: geocodeData.lng });
+            } else {
+              setStartPoint(null);
+            }
+          }
+        } catch (e) {
+          setStartPoint(null);
+        }
+      } else if (start && typeof start === 'object') {
+        // Start is coordinate object - send as [lat, lng] array
+        startPayload = [start.lat, start.lng];
+        setStartPoint(start);
+      } else {
+        throw new Error('Invalid start parameter');
       }
-    };
+      
+      if (typeof end === 'string') {
+        // End is a location name - send as string to backend
+        endPayload = end;
+        // Geocode to get coordinates for marker display
+        try {
+          const geocodeRes = await fetch('http://localhost:8000/api/geocode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: end }),
+          });
+          if (geocodeRes.ok) {
+            const geocodeData = await geocodeRes.json();
+            if (geocodeData && geocodeData.lat && geocodeData.lng) {
+              setEndPoint({ lat: geocodeData.lat, lng: geocodeData.lng });
+            } else {
+              setEndPoint(null);
+            }
+          }
+        } catch (e) {
+          setEndPoint(null);
+        }
+      } else if (end && typeof end === 'object') {
+        // End is coordinate object - send as [lat, lng] array
+        endPayload = [end.lat, end.lng];
+        setEndPoint(end);
+      } else {
+        throw new Error('Invalid end parameter');
+      }
 
-    setRoute(mockRoute);
-
-    // Analyze route segments for safety
-    analyzeRouteSegments(mockRoute, avoidRiskLevels);
-
-    // Log consent if user proceeded despite warning
-    if (userConsent) {
-      console.log('User consent logged for high-risk destination:', {
-        destination: end,
-        timestamp: new Date().toISOString()
+      const response = await fetch('http://localhost:8000/api/safe-route', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          start: startPayload,
+          end: endPayload,
+          profile: 'foot-walking',
+          avoid_risk_levels: avoidRiskLevels,
+        }),
       });
+
+      if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error('Route request failed: 413 Request too large. Try reducing avoided zones or simplifying dataset.');
+        }
+        throw new Error(`Route request failed: ${response.status}`);
+      }
+
+      const routeData = await response.json();
+      
+      // Extract route geometry from ORS GeoJSON response
+      // ORS returns GeoJSON with features array
+      if (routeData.features && routeData.features.length > 0) {
+        const routeGeometry = routeData.features[0];
+        setRoute(routeGeometry);
+        analyzeRouteSegments(routeGeometry, avoidRiskLevels);
+      } else if (routeData.routes && routeData.routes.length > 0) {
+        // Fallback for non-GeoJSON format
+        const routeGeometry = routeData.routes[0];
+        setRoute(routeGeometry);
+        analyzeRouteSegments(routeGeometry, avoidRiskLevels);
+      } else {
+        throw new Error('No route found');
+      }
+
+      // Log consent if user proceeded despite warning
+      if (userConsent) {
+        await fetch('http://localhost:8000/api/log-entry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            destination: end,
+            risk_level: 'forbidden',
+            user_consent: true,
+            timestamp: new Date().toISOString(),
+          }),
+        });
+      }
+    } catch (error) {
+      // User-friendly error messages
+      let errorMessage = 'Failed to generate route. ';
+      
+      if (error.message.includes('404')) {
+        errorMessage += 'The location could not be found. Please check your input.';
+      } else if (error.message.includes('413')) {
+        errorMessage += 'Too many avoid zones selected. Try reducing the number of avoided areas.';
+      } else if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        errorMessage += 'The request took too long. Try reducing avoid zones or simplifying the route.';
+      } else if (error.message.includes('503') || error.message.includes('unavailable')) {
+        errorMessage += 'The routing service is temporarily unavailable. Please try again in a moment.';
+      } else {
+        errorMessage += error.message || 'Please try again.';
+      }
+      
+      alert(errorMessage);
+      setRoute(null);
+      setRouteSegments([]);
+    } finally {
+      setRouteLoading(false);
     }
   };
 
   // Analyze route segments against geofences
   const analyzeRouteSegments = (route, avoidRiskLevels) => {
-    const routeLine = turf.lineString(route.geometry.coordinates);
+    if (!safetyData?.features || !route?.geometry?.coordinates) {
+      setRouteSegments([]);
+      return;
+    }
+
     const segments = [];
 
     // Split route into segments and check intersection with geofences
@@ -206,12 +355,12 @@ const MapView = () => {
       let intersectedZones = [];
 
       // Check intersection with each geofence
-      geofences.features.forEach(geofence => {
+      safetyData.features.forEach(geofence => {
         const polygon = turf.polygon(geofence.geometry.coordinates);
         try {
           const intersects = turf.booleanIntersects(segment, polygon);
           if (intersects) {
-            intersectedZones.push(geofence.properties.name);
+            intersectedZones.push(geofence.properties.station_name);
             if (geofence.properties.risk_level === 'forbidden') {
               segmentRisk = 'forbidden';
             } else if (geofence.properties.risk_level === 'caution' && segmentRisk !== 'forbidden') {
@@ -255,6 +404,7 @@ const MapView = () => {
         setIsTracking={setIsTracking}
         routeSegments={routeSegments}
         userLocation={userLocation}
+        routeLoading={routeLoading}
       />
 
       <MapContainer
@@ -275,10 +425,13 @@ const MapView = () => {
           stationAreaIndex={policeStationAreaIndex}
         />
 
-        {/* Render geofence layers */}
-        <GeofenceLayer
-          geofences={geofences}
-          layerToggles={layerToggles}
+        {/* Render safety layers with ML predictions */}
+        <SafetyLayer
+          data={safetyData}
+          visibleRiskLevels={visibleRiskLevels}
+          onLayerClick={(stationName, properties) => {
+            // Station click handler
+          }}
         />
 
         {/* Start marker */}
@@ -295,21 +448,19 @@ const MapView = () => {
           </Marker>
         )}
 
-        {/* Route polyline with segment coloring */}
+        {/* Route polyline - blue color */}
         {route && routeSegments.length > 0 && (
           <>
             {routeSegments.map((segment, idx) => {
               const positions = segment.coordinates.map(coord => [coord[1], coord[0]]);
-              const color = segment.risk === 'forbidden' ? '#ef4444' :
-                           segment.risk === 'caution' ? '#f97316' : '#22c55e';
               
               return (
                 <Polyline
                   key={idx}
                   positions={positions}
-                  color={color}
+                  color="#3b82f6"
                   weight={5}
-                  opacity={0.7}
+                  opacity={0.8}
                 >
                   <Popup>
                     <div>
@@ -345,7 +496,7 @@ const MapView = () => {
         {/* Location tracker component */}
         <LocationTracker
           isTracking={isTracking}
-          geofences={geofences}
+          geofences={safetyData}
           onLocationUpdate={setUserLocation}
         />
       </MapContainer>

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Test script to verify WAQI API integration."""
 
 import asyncio
 import sys

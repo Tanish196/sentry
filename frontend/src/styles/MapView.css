@@ -17,15 +17,34 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 320px;
+  width: 340px;
   max-height: calc(100vh - 20px);
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
   z-index: 1000;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  backdrop-filter: blur(10px);
+}
+
+.route-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.route-panel::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.route-panel::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.route-panel::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .panel-header h3 {
@@ -36,7 +55,7 @@
 }
 
 .panel-header p {
-  margin: 0 0 20px 0;
+  /* margin: 0 0 20 0; */
   color: #6b7280;
   font-size: 14px;
 }
@@ -65,6 +84,12 @@
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
+  color: #000000;
+}
+
+.input-group input::placeholder {
+  color: #6b7280;
+  opacity: 1;
 }
 
 .input-group input:focus {
@@ -289,11 +314,20 @@
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  position: relative;
 }
 
-.primary-button:hover {
+.primary-button:hover:not(:disabled) {
   background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.primary-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .secondary-button {
@@ -305,11 +339,20 @@
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-.secondary-button:hover {
+.secondary-button:hover:not(:disabled) {
   background-color: #e5e7eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.secondary-button:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* Tracking Toggle */
@@ -597,6 +640,91 @@
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider.tracking {
+  background-color: #10b981;
+}
+
+.toggle-slider.tracking {
+  background-color: #d1d5db;
+}
+
+/* Enhanced Panel Header */
+.panel-header {
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+/* Improved Input Focus States */
+.input-group input:hover {
+  border-color: #9ca3af;
+}
+
+/* Better Checkbox Styling */
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+/* Enhanced Toggle Transitions */
+.toggle-slider {
+  cursor: pointer;
+}
+
+.toggle-label:hover .toggle-slider {
+  opacity: 0.9;
+}
+
+/* Loading State for Route Panel */
+.route-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 8px;
+}
+
+.route-loading-content {
+  text-align: center;
+}
+
+.route-loading-content .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 12px;
+}
+
+.route-loading-content p {
+  color: #374151;
+  font-weight: 500;
 }
 
 /* Responsive Design */

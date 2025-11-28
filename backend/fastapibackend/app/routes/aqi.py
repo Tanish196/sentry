@@ -17,18 +17,16 @@ router = APIRouter(prefix="/aqi", tags=["aqi"])
 
 @router.get("", response_model=AQIResponse)
 async def get_aqi_for_all_stations():
-    """Get AQI data for all Delhi police stations using WAQI API."""
     settings = get_settings()
     
     try:
         aqi_dict = await fetch_aqi_from_waqi(
             waqi_token=settings.waqi_api_token,
-            max_concurrent=15,  # Reasonable concurrency for WAQI API
+            max_concurrent=15, 
             retry_delay=0.5,
             max_retries=2
         )
-        
-        # Build response using all available stations
+
         aqi_data_list = []
         available_stations = get_all_station_names()
         
@@ -58,11 +56,9 @@ async def get_aqi_for_all_stations():
 
 @router.get("/station/{station_name}")
 async def get_aqi_for_station(station_name: str):
-    """Get AQI data for a specific police station."""
     settings = get_settings()
     
     try:
-        # Fetch data for all stations (cached/optimized in production)
         aqi_dict = await fetch_aqi_from_waqi(
             waqi_token=settings.waqi_api_token,
             max_concurrent=15
@@ -90,7 +86,6 @@ async def get_aqi_for_station(station_name: str):
 
 @router.get("/stations")
 async def get_available_stations():
-    """Get list of all available police stations with coordinates."""
     from ..services.waqi_service import POLICE_STATION_COORDINATES
     
     stations = []

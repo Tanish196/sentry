@@ -10,7 +10,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const fullName = formData.fullName || "Traveler";
-  const location = formData.nationality || "Varanasi";
+  const location = formData.nationality || "Delhi";
 
   const [gpsLoading, setGpsLoading] = React.useState(true);
   const [currentLocation, setCurrentLocation] = React.useState(null);

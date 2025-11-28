@@ -1,14 +1,14 @@
 @reference 'tailwindcss';
 
 
-/* 🔲 Dark Overlay */
+/* Dark Overlay */
 .add-path-overlay {
   @apply fixed inset-0 z-2000 bg-black/70 backdrop-blur-sm
          flex items-center justify-center p-4 transition-opacity;
 }
 
 
-/* 🪟 Modal Box (Black + White Border Glow) */
+/* Modal Box (Black + White Border Glow) */
 .add-path-modal {
   @apply bg-black text-white rounded-2xl border border-white/20
          shadow-[0_0_25px_rgba(255,255,255,0.08)]
@@ -16,7 +16,7 @@
 }
 
 
-/* ❌ Close Button */
+/* Close Button */
 .add-path-close {
   @apply absolute top-4 right-4 text-gray-300 hover:text-white transition;
 }
@@ -32,7 +32,6 @@
 }
 
 
-/* ⚠ Error Box */
 .add-path-error {
   @apply mb-4 p-3 flex items-start rounded-lg text-sm 
          bg-red-900/40 border border-red-500 text-red-300
@@ -40,19 +39,19 @@
 }
 
 
-/* 📝 Form Layout */
+/* Form Layout */
 .add-path-form {
   @apply space-y-4 mb-6;
 }
 
 
-/* 🏷 Labels */
+/* Labels */
 .add-path-label {
   @apply block text-sm font-semibold text-gray-300 mb-1;
 }
 
 
-/* ✏ Inputs (Black + White Border) */
+/* Inputs (Black + White Border) */
 .add-path-input {
   @apply w-full px-4 py-2 rounded-lg bg-black text-white
          border border-white/20 shadow-inner shadow-white/5
@@ -61,7 +60,7 @@
 }
 
 
-/* 🚀 Submit Button */
+/* Submit Button */
 .add-path-submit {
   @apply w-full flex justify-center items-center py-3 px-4 rounded-lg
          text-lg font-semibold bg-white text-black 

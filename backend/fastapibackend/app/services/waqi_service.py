@@ -3,12 +3,19 @@
 import asyncio
 import json
 import logging
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
+from datetime import datetime
 
 import httpx
 from fastapi import HTTPException
 
 LOGGER = logging.getLogger(__name__)
+
+# Simple in-memory daily cache for WAQI results when fetching full station set
+_daily_aqi_cache: Dict[str, Any] = {
+    "date": None,
+    "data": None,
+}
 
 # Police station coordinates from GeoJSON mapped to names from constants.py
 POLICE_STATION_COORDINATES = {
@@ -179,7 +186,7 @@ POLICE_STATION_COORDINATES = {
 async def fetch_aqi_from_waqi(
     waqi_token: str,
     stations: Optional[List[str]] = None,
-    max_concurrent: int = 50,
+    max_concurrent: int = 25,
     retry_delay: float = 0.5,
     max_retries: int = 2
 ) -> Dict[str, Dict]:
@@ -202,7 +209,13 @@ async def fetch_aqi_from_waqi(
     if not waqi_token:
         raise HTTPException(status_code=500, detail="WAQI API token not configured")
     
+    # If no stations specified, allow daily cached full-result to reduce API calls
+    today_str = datetime.utcnow().date().isoformat()
     if stations is None:
+        # Return cached data if it's for today
+        if _daily_aqi_cache.get("date") == today_str and _daily_aqi_cache.get("data") is not None:
+            LOGGER.info("Returning cached daily WAQI data")
+            return _daily_aqi_cache["data"]
         station_coords = POLICE_STATION_COORDINATES
     else:
         station_coords = {}
@@ -323,7 +336,12 @@ async def fetch_aqi_from_waqi(
             success_count += 1
     
     LOGGER.info(f"AQI fetch completed: {success_count} successful, {error_count} errors")
-    
+
+    # If we fetched for whole city (stations was None), update daily cache
+    if stations is None:
+        _daily_aqi_cache["date"] = today_str
+        _daily_aqi_cache["data"] = results
+
     return results
 
 

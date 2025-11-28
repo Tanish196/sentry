@@ -6,7 +6,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .models import load_model_artifacts
-from .routes import health_router, aqi_router, prediction_router
+from .routes import (
+    health_router,
+    aqi_router,
+    prediction_router,
+    route_router,
+    safety_router,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,4 +34,6 @@ app.add_middleware(
 # Include routers
 app.include_router(health_router)
 app.include_router(aqi_router)
-app.include_router(prediction_router)
+app.include_router(prediction_router, prefix="/api")
+app.include_router(route_router, prefix="/api")
+app.include_router(safety_router, prefix="/api")

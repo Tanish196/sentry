@@ -85,6 +85,8 @@ const LocationTracker = ({ isTracking, geofences, onLocationUpdate }) => {
   };
 
   const checkGeofenceIntersections = (latLng) => {
+    if (!geofences?.features) return;
+
     const point = turf.point([latLng.lng, latLng.lat]);
     const newGeofences = new Set();
 
@@ -95,10 +97,11 @@ const LocationTracker = ({ isTracking, geofences, onLocationUpdate }) => {
         const isInside = turf.booleanPointInPolygon(point, polygon);
 
         if (isInside) {
-          newGeofences.add(geofence.properties.id);
+          const stationId = geofence.properties.station_name;
+          newGeofences.add(stationId);
 
           // Check if this is a new entry
-          if (!currentGeofencesRef.current.has(geofence.properties.id)) {
+          if (!currentGeofencesRef.current.has(stationId)) {
             handleGeofenceEntry(geofence, latLng);
           }
         }
@@ -108,9 +111,9 @@ const LocationTracker = ({ isTracking, geofences, onLocationUpdate }) => {
     });
 
     // Check for exits
-    currentGeofencesRef.current.forEach(geofenceId => {
-      if (!newGeofences.has(geofenceId)) {
-        const geofence = geofences.features.find(f => f.properties.id === geofenceId);
+    currentGeofencesRef.current.forEach(stationId => {
+      if (!newGeofences.has(stationId)) {
+        const geofence = geofences.features.find(f => f.properties.station_name === stationId);
         if (geofence) {
           handleGeofenceExit(geofence, latLng);
         }
@@ -121,60 +124,60 @@ const LocationTracker = ({ isTracking, geofences, onLocationUpdate }) => {
     currentGeofencesRef.current = newGeofences;
   };
 
-  const handleGeofenceEntry = (geofence, latLng) => {
-    const { id, name, risk_level, safety_score } = geofence.properties;
+  const handleGeofenceEntry = async (geofence, latLng) => {
+    const { station_name, risk_level, safety_score } = geofence.properties;
 
     // Show UI alert
     showGeofenceAlert('entry', geofence, latLng);
 
-    // In production, send to backend
-    console.log('Geofence entry alert:', {
-      userId: 'current-user', // Would come from auth context
-      geofenceId: id,
-      lat: latLng.lat,
-      lng: latLng.lng,
-      timestamp: new Date().toISOString(),
-      action: 'entry'
-    });
-
-    // Mock API call
-    mockSendAlert('entry', {
-      userId: 'current-user',
-      geofenceId: id,
-      lat: latLng.lat,
-      lng: latLng.lng,
-      timestamp: new Date().toISOString()
-    });
+    // Send to backend
+    try {
+      await fetch('http://localhost:8000/api/log-entry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          geofence_id: station_name,
+          station_name: station_name,
+          risk_level: risk_level,
+          safety_score: safety_score,
+          lat: latLng.lat,
+          lng: latLng.lng,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (error) {
+      console.error('Error logging geofence entry:', error);
+    }
   };
 
-  const handleGeofenceExit = (geofence, latLng) => {
-    const { id, name, risk_level, safety_score } = geofence.properties;
+  const handleGeofenceExit = async (geofence, latLng) => {
+    const { station_name, risk_level, safety_score } = geofence.properties;
 
     // Show UI alert
     showGeofenceAlert('exit', geofence, latLng);
 
-    // In production, send to backend
-    console.log('Geofence exit alert:', {
-      userId: 'current-user',
-      geofenceId: id,
-      lat: latLng.lat,
-      lng: latLng.lng,
-      timestamp: new Date().toISOString(),
-      action: 'exit'
-    });
-
-    // Mock API call
-    mockSendAlert('exit', {
-      userId: 'current-user',
-      geofenceId: id,
-      lat: latLng.lat,
-      lng: latLng.lng,
-      timestamp: new Date().toISOString()
-    });
+    // Send to backend
+    try {
+      await fetch('http://localhost:8000/api/log-exit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          geofence_id: station_name,
+          station_name: station_name,
+          risk_level: risk_level,
+          safety_score: safety_score,
+          lat: latLng.lat,
+          lng: latLng.lng,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (error) {
+      console.error('Error logging geofence exit:', error);
+    }
   };
 
   const showGeofenceAlert = (action, geofence, latLng) => {
-    const { name, risk_level } = geofence.properties;
+    const { station_name, risk_level } = geofence.properties;
     const actionText = action === 'entry' ? 'entered' : 'exited';
     const riskColor = risk_level === 'forbidden' ? '#ef4444' :
                      risk_level === 'caution' ? '#f97316' : '#22c55e';
@@ -185,7 +188,7 @@ const LocationTracker = ({ isTracking, geofences, onLocationUpdate }) => {
     alertDiv.innerHTML = `
       <div class="alert-content">
         <strong>Zone Alert</strong><br>
-        You have ${actionText}: <strong style="color: ${riskColor}">${name}</strong><br>
+        You have ${actionText}: <strong style="color: ${riskColor}">${station_name}</strong><br>
         <small>Risk Level: ${risk_level.toUpperCase()}</small>
       </div>
     `;
@@ -214,21 +217,6 @@ const LocationTracker = ({ isTracking, geofences, onLocationUpdate }) => {
         alertDiv.parentNode.removeChild(alertDiv);
       }
     }, 5000);
-  };
-
-  const mockSendAlert = async (action, data) => {
-    try {
-      // Mock API call - in production this would be:
-      // await fetch(`/api/alert-${action}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data)
-      // });
-
-      console.log(`Mock API call: POST /api/alert-${action}`, data);
-    } catch (error) {
-      console.error('Error sending alert:', error);
-    }
   };
 
   return null; // This component doesn't render anything visible
